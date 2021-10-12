@@ -1,5 +1,4 @@
 class MoviesController < ApplicationController
-
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -7,8 +6,46 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
-  end
+    @all_ratings = Movie.get_movie_rating_collection
+
+    if params[:ratings]
+      @ratings =  params[:ratings]
+    elsif session[:ratings]
+      @ratings = session[:ratings]
+    else
+      query = Hash.new
+      @all_ratings.each do |rating|
+        query[ rating] =1
+      @ratings = query
+      end
+    end
+    
+    if  params[:sort]
+        @sort = params[:sort]
+    elsif session[:sort]
+        @sort = session[:sort]
+    end
+    @movies = Movie.where(rating: @ratings.keys)
+    
+    if params[:sort]!=session[:sort] or params[:ratings]!=session[:ratings]
+      session[:sort] = @sort
+      session[:ratings] = @ratings
+      flash.keep
+      redirect_to movies_path(sort: session[:sort],ratings: session[:ratings])
+    end 
+    
+    if params[:sort] == "title"
+      @movies = @movies.order(title: :asc)
+      @temp = "bg-warning"
+    elsif params[:sort] == "release_date"
+      @movies =  @movies.order(release_date: :asc)
+      @rell = "bg-warning"
+    else
+      @temp ="bg-white" 
+      @rell = "bg-white"
+    end
+
+  end 
 
   def new
     # default: render 'new' template

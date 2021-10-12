@@ -6,4 +6,8 @@ class Movie < ActiveRecord::Base
         end
          Movie.where(director: director)
      end
+    
+    def self.get_movie_rating_collection
+        distinct.pluck(:rating)
+    end
 end
