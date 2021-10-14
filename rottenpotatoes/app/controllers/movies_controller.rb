@@ -6,48 +6,29 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.get_movie_rating_collection
+    sort = params[:sort] || session[:sort]
+    case sort
+    when 'title'
+      ordering,@title_header = {:title => :asc}, 'bg-warning hilite'
+    when 'release_date'
+      ordering,@date_header = {:release_date => :asc}, 'bg-warning hilite'
+    end
+    @all_ratings = Movie.all_ratings
+    @selected_ratings = params[:ratings] || session[:ratings] || {}
 
-    if params[:ratings]
-      @ratings =  params[:ratings]
-    elsif session[:ratings]
-      @ratings = session[:ratings]
-    else
-      query = Hash.new
-      @all_ratings.each do |rating|
-        query[ rating] =1
-      @ratings = query
-      end
-    end
-    
-    if  params[:sort]
-        @sort = params[:sort]
-    elsif session[:sort]
-        @sort = session[:sort]
-    end
-    @movies = Movie.where(rating: @ratings.keys)
-    
-    if params[:sort]!=session[:sort] or params[:ratings]!=session[:ratings]
-      session[:sort] = @sort
-      session[:ratings] = @ratings
-      flash.keep
-      redirect_to movies_path(sort: session[:sort],ratings: session[:ratings])
-    end 
-    
-    if params[:sort] == "title"
-      @movies = @movies.order(title: :asc)
-      @temp = "bg-warning"
-    elsif params[:sort] == "release_date"
-      @movies =  @movies.order(release_date: :asc)
-      @rell = "bg-warning"
-    else
-      @temp ="bg-white" 
-      @rell = "bg-white"
+    if @selected_ratings == {}
+      @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
     end
 
-  end 
+    if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
+      session[:sort] = sort
+      session[:ratings] = @selected_ratings
+      redirect_to :sort => sort, :ratings => @selected_ratings and return
+    end
+    @movies = Movie.where(rating: @selected_ratings.keys).order(ordering)
+  end
 
-  def new
+   def new
     # default: render 'new' template
   end
 
@@ -74,7 +55,7 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-  
+
   
   def similar_movie
     @movie = Movie.find params[:id]
@@ -83,7 +64,7 @@ class MoviesController < ApplicationController
        redirect_to movies_path
      end
      @movies = Movie.find_similar_movies(params[:id])
-   end
+  end
     
   
 

@@ -1,4 +1,8 @@
 class Movie < ActiveRecord::Base
+    def self.all_ratings
+        %w(G PG PG-13 NC-17 R)
+    end
+    
     def self.find_similar_movies(movie)
          director = Movie.find_by_id(movie).director
          if director.nil? or director.blank?
@@ -8,6 +12,8 @@ class Movie < ActiveRecord::Base
      end
     
     def self.get_movie_rating_collection
-        distinct.pluck(:rating)
+        self.distinct.pluck(:rating)
     end
+    
+
 end
