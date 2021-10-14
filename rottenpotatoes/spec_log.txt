@@ -1,0 +1,39 @@
+
+MoviesController
+  new
+    do nothing
+  go to homepage
+    shows all movies
+  show
+    show the movie
+  create
+    create a movie
+  edit
+    edit a movie
+  update movie
+    update a movie
+  delete movie
+    delete a movie
+  find movies with the same director
+    specified movie has a director
+    specified movie dose not have a director
+
+Movie
+  able to get ratings
+  rating
+  get one rating
+  responds to have_ratings
+  responds to similar_to
+  movies with id
+    rating should fit title
+  find movie with same director.
+    it should return the correct matches for movies by the same director
+  movie without director
+    movie with no director should return nil
+
+1 deprecation warning total
+
+Finished in 0.3803 seconds (files took 1.61 seconds to load)
+17 examples, 0 failures
+
+Coverage report generated for Cucumber Features, RSpec to /home/ec2-user/environment/hw-acceptance-unit-test-cycle/rottenpotatoes/coverage. 62 / 63 LOC (98.41%) covered.
